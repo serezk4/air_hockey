@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: 'chat-service'
+  main:
+    web-application-type: reactive
+  webflux:
+    base-path: /
+
+  profiles:
+    active: dev

@@ -1,0 +1,49 @@
+services:
+  chats-postgres-dev:
+    image: postgres:16.3
+    restart: "no"
+    ports:
+      - "5433:5432"
+    volumes:
+      - dev_postgres_data:/var/lib/postgresql/data
+      - ./env/dev/init/db:/docker-entrypoint-initdb.d
+    env_file:
+      - env/dev/secrets/postgres-secrets.env
+      - env/dev/postgres.env
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+  chats-redis-dev:
+    image: redis:latest
+    restart: always
+    env_file:
+      - env/dev/secrets/redis-secrets.env
+    ports:
+      - "5665:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+  chats-rabbitmq-dev:
+    image: rabbitmq:latest
+    ports:
+      - "5675:5672"   # AMQP protocol port
+      - "15676:15672" # Management plugin port
+      - "61617:61613" # STOMP protocol port
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+#    command: |
+#      rabbitmq-plugins enable rabbitmq_management rabbitmq_stomp rabbitmq_web_stomp &&
+#      rabbitmq-server
+
+volumes:
+  dev_postgres_data:
+  rabbitmq_data:

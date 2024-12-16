@@ -1,0 +1,64 @@
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    container_name: game-master-redis
+    env_file:
+      - ${CONFIG_BASE_PATH}/api/game-master/secret/redis-secret.env
+    ports:
+      - "127.0.0.1::6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    networks:
+      - api_game_master
+
+  chat-api:
+    image: chat-api:latest
+    container_name: chat-api
+    build:
+      context: .
+      args:
+        DOCKER_BUILDKIT: 1
+    restart: always
+    env_file:
+      - ${CONFIG_BASE_PATH}/service/postgres/secret/postgres-secret.env
+      - ${CONFIG_BASE_PATH}/service/postgres/postgres.env
+      - ${CONFIG_BASE_PATH}/api/game-master/secret/redis-secret.env
+      - ${CONFIG_BASE_PATH}/api/game-master/postgres.env
+      - ${CONFIG_BASE_PATH}/service/keycloak/realm.env
+      - ${CONFIG_BASE_PATH}/service/keycloak/secret/client.env
+      - ${CONFIG_BASE_PATH}/service/rabbitmq/rabbitmq.env
+      - ${CONFIG_BASE_PATH}/service/rabbitmq/secret/rabbitmq-secret.env
+    ports:
+      - "127.0.0.1:1000:8080"
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 5
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - api_game_master
+      - service_rabbitmq
+      - service_postgres
+      - service_keycloak
+
+volumes:
+  postgres_data:
+
+networks:
+  api_game_master:
+    driver: bridge
+  service_rabbitmq:
+    external: true
+  service_postgres:
+    external: true
+  service_keycloak:
+    external: true

@@ -1,0 +1,12 @@
+{
+  "vhosts": [
+    {"name": "/"}
+  ],
+  "queues": [
+    {
+      "name": "chat-queue",
+      "vhost": "/",
+      "durable": true
+    }
+  ]
+}

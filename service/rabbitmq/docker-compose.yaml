@@ -1,0 +1,30 @@
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "127.0.0.1::5672"
+      - "127.0.0.1:15672:15672"
+      - "127.0.0.1::61613"
+    env_file:
+      - ${CONFIG_BASE_PATH}/service/rabbitmq/secret/rabbitmq-secret.env
+    networks:
+      - service_rabbitmq
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq-init.sh:/docker-entrypoint-initdb.d/rabbitmq-init.sh
+      - ${CONFIG_BASE_PATH}/service/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ${CONFIG_BASE_PATH}/service/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  service_rabbitmq:
+    external: true

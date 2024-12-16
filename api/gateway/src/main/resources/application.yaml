@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: 'gateway'
+  main:
+    web-application-type: reactive
+  webflux:
+    base-path: /
+
+  profiles:
+    active: dev
