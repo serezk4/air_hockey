@@ -47,8 +47,8 @@ services:
     networks:
       - api_game_master
       - service_rabbitmq
-      - service_postgres
-      - service_keycloak
+      - service_postgres_network
+      - service_keycloak_network
 
 volumes:
   postgres_data:
@@ -58,7 +58,7 @@ networks:
     driver: bridge
   service_rabbitmq:
     external: true
-  service_postgres:
+  service_postgres_network:
     external: true
-  service_keycloak:
+  service_keycloak_network:
     external: true
