@@ -16,9 +16,9 @@ services:
     networks:
       - api_game_master
 
-  chat-api:
-    image: chat-api:latest
-    container_name: chat-api
+  game-master:
+    image: game-master:latest
+    container_name: game-master
     build:
       context: .
       args:

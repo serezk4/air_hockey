@@ -1,0 +1,22 @@
+{
+  "name": "phaser-game",
+  "version": "1.0.0",
+  "description": "Футзальная игра на Phaser",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "webpack serve --open",
+    "build": "webpack"
+  },
+  "dependencies": {
+    "phaser": "^3.55.2"
+  },
+  "devDependencies": {
+    "webpack": "^5.64.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0",
+    "babel-loader": "^8.2.3",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.6"
+  }
+}
+

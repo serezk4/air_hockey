@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: 'user-service'
+  main:
+    web-application-type: reactive
+  webflux:
+    base-path: /account
+
+  profiles:
+    active: dev

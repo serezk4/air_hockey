@@ -1,5 +1,6 @@
 
 docker network create --driver bridge --attachable api_game_master
+docker network create --driver bridge --attachable api_user_network
 docker network create --driver bridge --attachable gateway_network
 
 docker network create --driver bridge --attachable service_grafana

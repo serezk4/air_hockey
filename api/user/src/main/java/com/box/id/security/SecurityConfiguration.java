@@ -1,6 +1,7 @@
-package com.serezk4.gateway.security;
+package com.box.id.security;
 
-import com.serezk4.gateway.security.auth.converter.CustomJwtAuthenticationConverter;
+import com.box.id.security.auth.converter.CustomJwtAuthenticationConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -91,12 +92,16 @@ public class SecurityConfiguration {
         return http
                 // Authorization settings
                 .authorizeExchange(exchanges -> exchanges
-                        // actuator endpoints
+                        // Permit access to Swagger UI, API documentation, and Actuator endpoints
                         .pathMatchers(
+                                "/webjars/**",
+                                "/api-docs/**", "/api-docs",
+                                "/swagger-ui.html",
                                 "/actuator/**"
                         ).permitAll()
 
-                        .pathMatchers("/account/signup").permitAll()
+                        // Permit access to signup endpoints
+                        .pathMatchers("/signup", "/signup/**").permitAll()
 
                         // Allow OPTIONS requests for CORS pre-flight
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()

@@ -1,0 +1,58 @@
+services:
+  redis:
+    image: redis:latest
+    restart: on-failure
+    container_name: user-api-redis
+    env_file:
+      - ${CONFIG_BASE_PATH}/api/account/secret/redis-secret.env
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    networks:
+      - api_user_network
+
+  user-api:
+    image: user-api:latest
+    container_name: user-api
+    build:
+      context: .
+      args:
+        DOCKER_BUILDKIT: 1
+    restart: on-failure
+    env_file:
+      # component related env
+      - ${CONFIG_BASE_PATH}/api/account/secret/redis-secret.env
+      # service related env
+      - ${CONFIG_BASE_PATH}/service/postgres/postgres.env
+      - ${CONFIG_BASE_PATH}/service/keycloak/realm.env
+      - ${CONFIG_BASE_PATH}/service/keycloak/secret/client.env
+      - ${CONFIG_BASE_PATH}/service/keycloak/secret/admin.env
+      # ports:
+      #   - "127.0.0.1::8080"
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/account/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 5
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - api_user_network
+      - service_keycloak_network
+      - service_postgres_network
+
+volumes:
+  postgres_data:
+
+networks:
+  api_user_network:
+    external: true
+  service_keycloak_network:
+    external: true
+  service_postgres_network:
+    external: true

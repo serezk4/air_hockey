@@ -33,6 +33,7 @@ public class GamePhysicsHandler implements WebSocketMessageHandler {
         try {
             GameUpdateRequest request = objectMapper.readValue(message, GameUpdateRequest.class);
             String gameId = request.getGameId();
+            subscriptionManager.subscribe(gameId, session);
 
             GameState state = gameStates.computeIfAbsent(gameId, id -> new GameState());
             state.updatePlayerPosition(request.getPlayerId(), request.getPosition());
@@ -49,7 +50,6 @@ public class GamePhysicsHandler implements WebSocketMessageHandler {
         }
     }
 
-    // DTO для входящего сообщения
     private static class GameUpdateRequest {
         String gameId;
         String playerId;
@@ -60,7 +60,6 @@ public class GamePhysicsHandler implements WebSocketMessageHandler {
         public double getPosition() { return position; }
     }
 
-    // Состояние игры
     private static class GameState {
         private final Map<String, Double> playerPositions = new ConcurrentHashMap<>();
 
@@ -69,7 +68,7 @@ public class GamePhysicsHandler implements WebSocketMessageHandler {
         }
 
         void applyPhysics() {
-            playerPositions.replaceAll((player, pos) -> pos + 1); // Пример физики: движение вперёд
+            playerPositions.replaceAll((player, pos) -> pos + 1);
         }
 
         public Map<String, Double> getPlayerPositions() {
